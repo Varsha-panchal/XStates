@@ -1,15 +1,50 @@
 
+import React, { useState, useEffect } from "react";
+import CountryDropdown from "./CountryDropdown";
+import StateDropdown from "./StateDropdown";
+import CityDropdown from "./CityDropdown";
 
-import React from 'react';
-import LocationSelector from './LocationSelector';
+export default function App() {
+  const [countries, setCountries] = useState([]);
+  const [selectedCountry, setSelectedCountry] = useState(null);
+  const [selectedState, setSelectedState] = useState(null);
+  const [selectedCity, setSelectedCity] = useState(null);
 
-const App = () => {
+  // Fetch countries on initial render
+  useEffect(() => {
+    fetch("https://crio-location-selector.onrender.com/countries")
+      .then((response) => response.json())
+      .then((data) => setCountries(data))
+      .catch((error) => console.error("Error fetching countries:", error));
+  }, []);
+
   return (
     <div>
-      <h1>Location Selector App</h1>
-      <LocationSelector />
+      <CountryDropdown
+        countries={countries}
+        selectedCountry={selectedCountry}
+        setSelectedCountry={setSelectedCountry}
+      />
+      {selectedCountry && (
+        <StateDropdown
+          country={selectedCountry}
+          selectedState={selectedState}
+          setSelectedState={setSelectedState}
+        />
+      )}
+      {selectedState && (
+        <CityDropdown
+          country={selectedCountry}
+          state={selectedState}
+          selectedCity={selectedCity}
+          setSelectedCity={setSelectedCity}
+        />
+      )}
+      {selectedCity && (
+        <div>
+          <p>{`You Selected ${selectedCity}, ${selectedState}, ${selectedCountry}`}</p>
+        </div>
+      )}
     </div>
   );
 };
-
-export default App;
